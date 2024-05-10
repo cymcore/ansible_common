@@ -1,0 +1,13 @@
+# Use raw characters for bypasssing jinja2 syntax 2) elegant way to do if with grep without error
+
+- name: 1) Use raw characters for bypasssing jinja2 syntax 2) elegant way to do if with grep without error
+  become: true
+  shell:  docker image ls --format {%raw%}'{{.Repository}}:{{.Tag}}'{%endraw%} | grep -q "{{ dockerImageName }}" && echo -n true || echo -n false
+  register: isImageExists
+
+# Get vars from another host in play
+- file: "{{ hostvars.localhost.vmInstanceFile }}"
+
+# Set variable to lookup of another variable(e.g. bootstrap_sys_pw is the name of variable, which has the value we want)
+# Note dont need this to do myVar: "{{myOtherVar}}"
+ansible_become_password: {{(lookup('vars', bootstrap_sys_pw))}}

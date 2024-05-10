@@ -1,0 +1,60 @@
+- name: Creates container exp directories
+  become: true
+  tags: out
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { dest: 'config', mode: '0770', owner: 'root', group: 'root'}
+    - { dest: 'config/qBittorrent', mode: '0770', owner: 'root', group: 'root'}
+
+- name: Copy container exp files
+  become: true
+  tags: out
+  copy: 
+    src: "{{ item.src }}"
+    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    force: "{{ item.force }}"
+    decrypt: yes
+  with_items:
+    - { src: 'qBittorrent.conf', dest: 'config/qBittorrent/qBittorrent.conf', mode: '0660', owner: 'root', group: 'root', force: 'yes'}
+
+- name: Copy container exp templates
+  become: true
+  tags: out
+  template: 
+    src: "{{ item.src }}"
+    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    force: "{{ item.force }}"
+    decrypt: yes
+  with_items:
+    - { src: 'entrypoint.sh', dest: 'entrypoint.sh', mode: '0740', owner: 'root', group: 'root', force: 'yes'}
+  
+- name: Empty files from netplan directory
+  become: true
+  file: 
+    state: absent 
+    path: "{{ netplanDirectoryPath }}"
+
+- name: Empty directories from netplan direcotry
+  become: true
+  file: 
+    state: directory
+    path: "{{ netplanDirectoryPath }}"
+
+# Stat a file and use return
+    - name: Check if previous /config exists
+      stat:
+        path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/config
+      register: doesPreviousInstallExist
+    
+then check this:   doesPreviousInstallExist.stat.exists

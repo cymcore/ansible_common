@@ -1,0 +1,15 @@
+# Interior \n are stripped out, although you get one at the end
+  shell: >
+    docker run -v {{ openvpnConfigVolumeName }}:/etc/openvpn/ --rm {{ dockerImageName }} ovpn_genconfig
+    -u '{{ vpnProto }}://{{ vpnExternalName }}:{{ vpnPort }}'
+    -b -d -N
+    -C 'AES-128-GCM'
+    -s '{{ vpnClientNetAndSub }}'
+    -e 'reneg-sec 0'
+
+# No line break at the end
+    content: >-
+      {{ rdpUserPassword }}
+
+
+

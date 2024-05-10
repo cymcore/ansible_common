@@ -1,0 +1,34 @@
+ ### this does main prompting for variables used for the entire role
+
+- name: Check if variable is defined or should prompt user
+  pause:
+    prompt: "{{ item.prompt }}"
+  register: prompt_answer
+  when: promptVariables is defined and (lookup('vars', item.vname, default='') is none or lookup('vars', item.vname, default='') | length == 0)
+  with_items: "{{ promptVariables }}"
+
+- name: Assign prompt answers to variables
+  set_fact:
+    "{{ item.item.vname }}": "{{ item.user_input }}"
+  when: promptVariables is defined and item.user_input is defined
+  with_items: "{{ prompt_answer.results }}"
+
+
+  ### this does param_action prompting
+
+- name: Check if variable is defined or should prompt user
+  vars:
+    promptVariablesParamAction: "{{ lookup('vars', 'promptVariables' + '_' + param_action, default='') if param_action is defined else ''}}"
+  pause:
+    prompt: "{{ item.prompt }}"
+  register: prompt_answer
+  when: (promptVariablesParamAction | length > 0) and (lookup('vars', item.vname, default='') is none or lookup('vars', item.vname, default='') | length == 0)
+  with_items: "{{ promptVariablesParamAction }}"
+
+- name: Assign prompt answers to variables
+  vars:
+    promptVariablesParamAction: "{{ lookup('vars', 'promptVariables' + '_' + param_action, default='') if param_action is defined else ''}}"
+  set_fact:
+    "{{ item.item.vname }}": "{{ item.user_input }}"
+  when: (promptVariablesParamAction | length > 0) and item.user_input is defined
+  with_items: "{{ prompt_answer.results }}"

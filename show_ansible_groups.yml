@@ -1,0 +1,13 @@
+- name: Show inventory groups and what hosts are in them
+  hosts: localhost
+  connection: local
+  vars:
+  tags:
+    - run
+  gather_facts: no
+  roles:
+  tasks:
+    -  shell: ansible-inventory --list --vault-password-file /private/vaultkey | jq 'del(._meta)'
+       register: ansibleGroups
+    -  debug:
+        var: ansibleGroups.stdout 

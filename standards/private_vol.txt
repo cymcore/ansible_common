@@ -1,0 +1,20 @@
+- name: Get info on private volume
+  become: true
+  community.docker.docker_volume_info:
+    name: "{{ dockerContainerName }}-private"
+  register: privateVolumeInfo
+
+- name: Copy certs and keys into private directory
+  become: true
+  copy: 
+    src:  "{{ dockerContainerName }}/"
+    dest: "{{ privateVolumeInfo.volume.Mountpoint }}/"
+    mode: '0600'
+    decrypt: yes
+
+- name: Create a file for storing the password (don't do this in command line otherwise ps can see the password)
+  become: true
+  copy:
+    dest: "{{ privateVolumeInfo.volume.Mountpoint }}/{{rdpUser}}pw.sec"
+    content: >-
+      {{ rdpUserPassword }}

@@ -1,0 +1,5 @@
+- name: Build new ansible role
+  hosts: localhost
+  roles:
+    - role: ansible_role
+      param_action: create

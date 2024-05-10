@@ -1,0 +1,14 @@
+- name: Insert container specific lines into run file
+  become: true
+  tags: out
+  lineinfile:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
+    line: "{{ item.linetext }}"
+    insertbefore: "{{ dockerImageName }}"
+    state: present
+  with_items:
+    - { linetext: "--volume /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/config/:/config/ \\"}
+    - { linetext: "-e PUID=\"{{ dockerAppUserAndGroupId | int}}\" \\"}
+    - { linetext: "-e PGID=\"{{ dockerAppUserAndGroupId | int}}\" \\"}
+    - { linetext: "--volume /volumes/p2p/p2ptemp:/p2ptemp/ \\"}
+    - { linetext: "--volume /volumes/p2p/p2ptor:/p2ptor/ \\"}

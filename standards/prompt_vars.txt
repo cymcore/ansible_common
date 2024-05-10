@@ -1,0 +1,8 @@
+- name: Include prompting for variables if not defined
+  include_tasks: common_prompt_vars.yml
+
+promptVariables:
+  - { vname: 'vmName', prompt: 'What is the virtual machine name to take action on?' }
+
+promptVariables_functionname:
+  - { vname: 'vmName', prompt: 'What is the virtual machine name to take action on?' }

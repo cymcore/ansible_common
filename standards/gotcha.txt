@@ -1,0 +1,4 @@
+1) If you use roles in play their main.yml variables are sources before pre_tasks.  Does not happen if you use include_role.
+2) When you call a role with a role variable (not vars:variable) it has very high precedence and even calling another does not change it.
+3) Multi level dictionaries can not be looped easily.  Change with dict2items.  This has a key value structure.  See app_vcenter/get_vm_info.
+4) Can do math inside var {{myVar / 100 | int}}
