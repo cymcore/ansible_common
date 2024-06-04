@@ -7,7 +7,6 @@ Configuration
 --------------
 
 
-
 Instructions
 ------------
 1) should be git cloned into the ansible root directory.
