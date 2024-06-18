@@ -7,13 +7,10 @@
       shell: apt update || true ; apt install -y $(cat {{playbook_dir}}/ansible_control_node_apts)
 
     - name: install pip packages from file
-      become: true
       shell: pip install -r {{playbook_dir}}/ansible_control_node_pip
 
     - name: install ansible galaxy roles from file
-      become: true
       shell: ansible-galaxy collection install -r {{playbook_dir}}/ansible_control_node_collections
 
     - name: run custom script for ansible control node
-      become: true
       shell: bash -c {{playbook_dir}}/ansible_control_node_custom
