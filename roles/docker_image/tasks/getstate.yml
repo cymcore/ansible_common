@@ -1,0 +1,14 @@
+- name: Check if image is on the docker server already
+  become: true
+  shell:  docker image ls --format {%raw%}'{{.Repository}}:{{.Tag}}'{%endraw%} | grep -q "{{ dockerImageName }}" && echo -n true || echo -n false
+  register: isImageExists
+
+- name: Check if image is being used by a container
+  become: true
+  shell:  docker ps -a --format {%raw%}'{{.Image}}'{%endraw%} | grep -q "{{ dockerImageName }}" && echo -n true || echo -n false
+  register: isImageContainerUsing
+
+- name: Get the next tag version number in case we need it in the next steps
+  become: true
+  shell:  docker image ls --format {%raw%}'{{.Tag}} {{.Repository}}'{%endraw%} | grep {{ dockerRepositoryName }} | cut -d ' ' -f 1 | cut -d "v" -f2 | sort -n | tail -n 1 | awk '{ print $1+1}'
+  register: nextTagVersionNumber

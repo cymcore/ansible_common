@@ -1,0 +1,13 @@
+---
+- name: Include prompting for variables if not defined
+  include_tasks: common_prompt_vars.yml
+
+- name: Ensure non-prompt variables are defined
+  assert:
+    that: item is defined
+    fail_msg: "Mandatory variables not set"
+  with_items:
+    - param_action
+  
+- name: Call action task file
+  include_tasks: "{{ param_action }}.yml"

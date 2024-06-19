@@ -1,0 +1,6 @@
+- name: Build the docker image
+  become: true
+  shell: 
+    cmd: docker build -t {{ dockerImageName }} .
+    chdir: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/build/
+  when: isImageExists.stdout == 'false'
