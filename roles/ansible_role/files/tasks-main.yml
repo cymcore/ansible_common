@@ -4,10 +4,9 @@
 
 - name: Ensure non-prompt variables are defined
   assert:
-    that: item is defined
+    that:
+      - param_action is defined
     fail_msg: "Mandatory variables not set"
-  with_items:
-    - param_action
   
 - name: Call action task file
   include_tasks: "{{ param_action }}.yml"
