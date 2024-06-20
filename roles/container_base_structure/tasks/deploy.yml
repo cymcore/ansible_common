@@ -1,0 +1,144 @@
+- name: Include prompting for variables if not defined
+  include_tasks: common_prompt_vars.yml
+
+- name: Check if container user and group exist so avoid duplicates
+  shell: cat /etc/passwd | grep -q "{{ dockerAppUserAndGroupName }}:" && echo -n true || echo -n false
+  register: checkContainerExists
+
+- name: Get current user (and in effect group as they are same) id if the current containers exists
+  shell: cat /etc/passwd | grep "{{ dockerAppUserAndGroupName }}:" | cut -d ":" -f 3
+  register: currentDockerAppUserAndGroupId
+  when: checkContainerExists.stdout == 'true'
+
+- name: Get next user and group id in the docker range (4000's)
+  shell: cat /etc/group /etc/passwd | cut -d ":" -f 3 | grep "^4...$" | sort -n | tail -n 1 | awk '{ print $1+1 }'
+  register: nextDockerAppUserAndGroupId
+  when: checkContainerExists.stdout == 'false'
+
+- name: Set dockerAppUserAndGroupId variable
+  set_fact:
+    dockerAppUserAndGroupId: "{{ currentDockerAppUserAndGroupId.stdout if (checkContainerExists.stdout == 'true') else nextDockerAppUserAndGroupId.stdout}}"
+
+- name:  Adding docker app group
+  become: true
+  group:
+    name: "{{ dockerAppUserAndGroupName }}"
+    gid: "{{ dockerAppUserAndGroupId | int }}"
+    state: present
+  when: checkContainerExists.stdout == 'false' and userRootContainer != 'y'
+
+- name: Adding docker app user
+  become: true
+  user:
+    name: "{{ dockerAppUserAndGroupName }}"
+    comment: Container user for {{ dockerContainerName }}
+    group: "{{ dockerAppUserAndGroupName }}"
+    uid: "{{ dockerAppUserAndGroupId | int }}"
+    shell: /bin/false
+    create_home: no
+    state: present
+  when: checkContainerExists.stdout == 'false' and userRootContainer != 'y'
+
+- name: Add a the private volume so it's there before the containers starts
+  become: true
+  community.docker.docker_volume:
+    name: "{{ dockerContainerName }}-private"
+    state: present
+   # If container user is non-root, have Dockerfile give permissions on /private
+
+- name: Creates container run app directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    state: directory
+
+- name: Apply acl to container run app directory
+  become: true
+  ansible.posix.acl:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    entity: "{{ dockerAppUserAndGroupName }}"
+    etype: group
+    permissions: rwx
+    state: present
+  when: userRootContainer != 'y'
+
+- name: Apply default acl to container run app directory
+  become: true
+  ansible.posix.acl:
+    default: yes
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    entity: "{{ dockerAppUserAndGroupName }}"
+    etype: group
+    permissions: rwx
+    state: present
+  when: userRootContainer != 'y'
+
+- name: Creates container exp directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp
+    state: directory
+
+- name: Creates container initfiles directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles
+    state: directory
+
+- name: Creates container sec directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles/ops
+    state: directory
+
+- name: Creates container src directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles/src
+    state: directory
+
+- name: Creates container out directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/out
+    state: directory
+
+- name: Creates container out directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/out/log
+    state: directory
+
+- name: Creates container build directory
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/build
+    state: directory
+
+- name: Creates container s6 directory structure for services
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/etc/{{ item.dirname }}
+    state: directory
+  with_items:
+  - { dirname: 'fix-attrs.d'}
+  - { dirname: 'cont-init.d'}
+  - { dirname: 'cont-finish.d'}
+  - { dirname: 'services.d'}
+  when: isS6Container == 'y'
+
+- name: Remove run file so this routine is idempotent
+  become: true
+  file:
+    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
+    state: absent
+
+- name: Copy template_run.sh docker file
+  become: true
+  template:
+    src: template_run.sh
+    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
+    owner: root
+    group: root
+    mode: '0770'
+    force: yes
