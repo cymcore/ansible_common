@@ -6,7 +6,15 @@
   assert:
     that:
       - param_action is defined
+      - logicalVolumeName is defined
+      - dockerContainerName is defined
+      - dockerImageName is defined
+      - dockerRepositoryName is defined
+      - dockerTagVersion is defined
     fail_msg: "Mandatory variables not set"
+
+- name: Get state of docker image to ensure you don't overwrite it in case other containers are using it
+  include_tasks: getstate.yml
   
 - name: Call action task file
   include_tasks: "{{ param_action }}.yml"
