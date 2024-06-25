@@ -2,15 +2,19 @@
 
 - name: Check if variable is defined or should prompt user
   pause:
-    prompt: "{{ item.prompt }}"
+    prompt: "{{ itemCPVprompt }}"
   register: prompt_answer
-  when: promptVariables is defined and (lookup('vars', item.vname, default='') is none or lookup('vars', item.vname, default='') | length == 0)
+  when: promptVariables is defined and (lookup('vars', itemCPVvname, default='') is none or lookup('vars', itemCPVvname, default='') | length == 0)
+  loop_control:
+    loop_var: itemCPV
   with_items: "{{ promptVariables }}"
 
 - name: Assign prompt answers to variables
   set_fact:
-    "{{ item.item.vname }}": "{{ item.user_input }}"
-  when: promptVariables is defined and item.user_input is defined
+    "{{ itemCPVitemCPVvname }}": "{{ itemCPVuser_input }}"
+  when: promptVariables is defined and itemCPVuser_input is defined
+  loop_control:
+    loop_var: itemCPV
   with_items: "{{ prompt_answer.results }}"
 
 
@@ -20,15 +24,19 @@
   vars:
     promptVariablesParamAction: "{{ lookup('vars', 'promptVariables' + '_' + param_action, default='') if param_action is defined else ''}}"
   pause:
-    prompt: "{{ item.prompt }}"
+    prompt: "{{ itemCPVprompt }}"
   register: prompt_answer
-  when: (promptVariablesParamAction | length > 0) and (lookup('vars', item.vname, default='') is none or lookup('vars', item.vname, default='') | length == 0)
+  when: (promptVariablesParamAction | length > 0) and (lookup('vars', itemCPVvname, default='') is none or lookup('vars', itemCPVvname, default='') | length == 0)
+  loop_control:
+    loop_var: itemCPV
   with_items: "{{ promptVariablesParamAction }}"
 
 - name: Assign prompt answers to variables
   vars:
     promptVariablesParamAction: "{{ lookup('vars', 'promptVariables' + '_' + param_action, default='') if param_action is defined else ''}}"
   set_fact:
-    "{{ item.item.vname }}": "{{ item.user_input }}"
-  when: (promptVariablesParamAction | length > 0) and item.user_input is defined
+    "{{ itemCPVitemCPVvname }}": "{{ itemCPVuser_input }}"
+  when: (promptVariablesParamAction | length > 0) and itemCPVuser_input is defined
+  loop_control:
+    loop_var: itemCPV
   with_items: "{{ prompt_answer.results }}"
