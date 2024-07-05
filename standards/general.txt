@@ -11,3 +11,7 @@
 # Set variable to lookup of another variable(e.g. bootstrap_sys_pw is the name of variable, which has the value we want)
 # Note dont need this to do myVar: "{{myOtherVar}}"
 ansible_become_password: {{(lookup('vars', bootstrap_sys_pw))}}
+
+
+delegate_to --> use the following and change the ansible to the delegate name --  in this example the delegate_to is ifire1
+ansible_ssh_private_key_file: "{{ hostvars['ifire1']['ansible_ssh_private_key_file'] }}"

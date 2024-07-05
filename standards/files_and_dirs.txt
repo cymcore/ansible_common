@@ -2,7 +2,7 @@
   become: true
   tags: out
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/{{ item.dest }}
     state: directory
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
@@ -16,7 +16,7 @@
   tags: out
   copy: 
     src: "{{ item.src }}"
-    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    dest: /volumes/docker/run/{{ dockerContainerName }}/exp/{{ item.dest }}
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
@@ -30,7 +30,7 @@
   tags: out
   template: 
     src: "{{ item.src }}"
-    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/{{ item.dest }}
+    dest: /volumes/docker/run/{{ dockerContainerName }}/exp/{{ item.dest }}
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
@@ -54,7 +54,7 @@
 # Stat a file and use return
     - name: Check if previous /config exists
       stat:
-        path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/config
+        path: /volumes/docker/run/{{ dockerContainerName }}/exp/config
       register: doesPreviousInstallExist
     
 then check this:   doesPreviousInstallExist.stat.exists
