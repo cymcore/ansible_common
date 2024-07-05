@@ -2,5 +2,5 @@
   become: true
   shell: 
     cmd: docker build -t {{ dockerImageName }} .
-    chdir: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/build/
+    chdir: /volumes/docker/run/{{ dockerContainerName }}/build/
   when: isImageExists.stdout == 'false'
