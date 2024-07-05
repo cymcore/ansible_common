@@ -1,7 +1,4 @@
 ---
-- name: Include prompting for variables if not defined
-  include_tasks: common_prompt_vars.yml
-
 - name: Ensure non-prompt variables are defined
   assert:
     that:
