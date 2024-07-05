@@ -49,13 +49,13 @@
 - name: Creates container run app directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    path: /volumes/docker/run/{{ dockerContainerName }}
     state: directory
 
 - name: Apply acl to container run app directory
   become: true
   ansible.posix.acl:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    path: /volumes/docker/run/{{ dockerContainerName }}
     entity: "{{ dockerAppUserAndGroupName }}"
     etype: group
     permissions: rwx
@@ -66,7 +66,7 @@
   become: true
   ansible.posix.acl:
     default: yes
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}
+    path: /volumes/docker/run/{{ dockerContainerName }}
     entity: "{{ dockerAppUserAndGroupName }}"
     etype: group
     permissions: rwx
@@ -76,49 +76,49 @@
 - name: Creates container exp directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp
     state: directory
 
 - name: Creates container initfiles directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/initfiles
     state: directory
 
 - name: Creates container sec directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles/ops
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/initfiles/ops
     state: directory
 
 - name: Creates container src directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/initfiles/src
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/initfiles/src
     state: directory
 
 - name: Creates container out directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/out
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/out
     state: directory
 
 - name: Creates container out directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/out/log
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/out/log
     state: directory
 
 - name: Creates container build directory
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/build
+    path: /volumes/docker/run/{{ dockerContainerName }}/build
     state: directory
 
 - name: Creates container s6 directory structure for services
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/exp/etc/{{ item.dirname }}
+    path: /volumes/docker/run/{{ dockerContainerName }}/exp/etc/{{ item.dirname }}
     state: directory
   with_items:
   - { dirname: 'fix-attrs.d'}
@@ -130,14 +130,14 @@
 - name: Remove run file so this routine is idempotent
   become: true
   file:
-    path: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
+    path: /volumes/docker/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
     state: absent
 
 - name: Copy template_run.sh docker file
   become: true
   template:
     src: template_run.sh
-    dest: /volumes/{{ logicalVolumeName }}/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
+    dest: /volumes/docker/run/{{ dockerContainerName }}/{{ dockerContainerName }}_run.sh
     owner: root
     group: root
     mode: '0770'

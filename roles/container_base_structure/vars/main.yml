@@ -1,12 +1,2 @@
 ---
 dockerAppUserAndGroupName: docker{{dockerContainerName}}
-
-promptVariables:
-    - { vname: 'isS6Container', prompt: 'is this a S6 container (y/n)?' }
-    - { vname: 'logicalVolumeName', prompt: 'what is the logical volume name (generally docker)' }
-    - { vname: 'dockerContainerName', prompt: 'what is the docker container name?' }
-    - { vname: 'userRootContainer', prompt: 'is this container using root as its user (y/n)?' }
-    - { vname: 'hostDomain', prompt: 'what is the host domain (generally cymcore.com)?' }
-    - { vname: 'containerNetwork', prompt: 'what is the docker network container should attach to (generally Production, DMZ, production_bridge, dmz_bridge)?' }
-
-
