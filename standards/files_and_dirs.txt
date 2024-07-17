@@ -58,3 +58,9 @@
       register: doesPreviousInstallExist
     
 then check this:   doesPreviousInstallExist.stat.exists
+
+
+ON CONTROLLER ONLY another way to stat a file -- returns bool
+  vars:
+    mydir: "{{ '/etc' is directory }}"
+    myfile: "{{ '/etc/hosts' is directory }}"
