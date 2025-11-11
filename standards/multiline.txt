@@ -13,3 +13,11 @@
 
 
 
+# Use bar to put a script in
+  shell: |
+    cd /volumes/media/media/audio_books
+    ls > audio_books_list.txt
+    cp audio_books_list.txt {{siteRoot}}/audio_books/audio_books_list.txt
+
+
+

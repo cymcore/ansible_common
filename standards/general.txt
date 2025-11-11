@@ -15,3 +15,9 @@ ansible_become_password: {{(lookup('vars', bootstrap_sys_pw))}}
 
 delegate_to --> use the following and change the ansible to the delegate name --  in this example the delegate_to is ifire1
 ansible_ssh_private_key_file: "{{ hostvars['ifire1']['ansible_ssh_private_key_file'] }}"
+
+# great way to set_fact for a variable if a bool exists and if not set something else
+workspaceConfigurationFile: "{{dockerContainerName+'_configure.sh' if (doesWorkspaceConfigurationFileExist.stat.exists) else 'default_configure.sh'}}"
+
+# set variable based on another variable value
+app_port: "{{ '80' if environment == 'production' else '8080' }}"
